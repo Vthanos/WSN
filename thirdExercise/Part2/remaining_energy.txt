@@ -1,0 +1,24 @@
+BEGIN {
+	MaxNodeId=0;
+}
+{
+	Event=$1;	Time=$3; NodeId=$5; Energy=$7;
+
+	if (Event=="N") {
+		if (NodeId > MaxNodeId) {
+			MaxNodeId = NodeId;
+		}
+
+		RemainingEnergy[NodeId] = Energy;
+	}
+}
+END {
+	TotalEnergyLeft=0.0;
+	for (node=0;node<=MaxNodeId;node++){
+#		printf("%i\t%f\n",node, RemainingEnergy[node]);
+		TotalEnergyLeft=TotalEnergyLeft+RemainingEnergy[node];
+	}
+	printf("\nAverage Energy Left: %f\n",TotalEnergyLeft/(MaxNodeId+1));
+}
+
+
