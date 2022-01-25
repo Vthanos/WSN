@@ -1,0 +1,40 @@
+BEGIN {
+	highest_packet_id=0;
+}
+{
+	Event=$1;	Time=$2;
+	Agt=$4;		Packet=$6;
+	Type=$7;	Bytes=$8;
+
+	if(Packet>highest_packet_id)
+		highest_packet_id=Packet;
+
+	if(Agt=="AGT" && Type=="cbr") {
+		if (Event=="s") {
+			start_time[Packet]=Time;
+		}
+		if (Event=="r") {
+			end_time[Packet]=Time;
+		}
+		if (Event=="D") {
+			end_time[Packet]=-1;
+		}
+
+	}
+}
+END {
+	for(packet_id=0;packet_id<=highest_packet_id;packet_id++) {
+		if (start_time[packet_id]<end_time[packet_id]) {
+			delay[packet_id]=end_time[packet_id]-start_time[packet_id];
+			acc_delay=acc_delay+delay[packet_id];
+			k++;
+			if (delay[packet_id]>max)
+				max=delay[packet_id];
+		}
+	}
+	printf("Mean Delay %f\n",acc_delay/k++);
+	printf("Max Delay %f\n",max);
+	printf("Number of transmitted packets %f\n",k);
+}
+
+
